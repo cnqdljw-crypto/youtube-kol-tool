@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>YouTube KOL分析工具</title>
+</head>
+
+<body>
+
+<h2>YouTube KOL分析工具</h2>
+
+<form method="post">
+
+频道链接：
+<input type="text" name="channel" required>
+
+<br><br>
+
+合作费用(USD)：
+<input type="number" name="price" required>
+
+<br><br>
+
+<button type="submit">开始分析</button>
+
+</form>
+
+{% if result %}
+
+<hr>
+
+{% if result.error %}
+
+<p>{{ result.error }}</p>
+
+{% else %}
+
+<p>最近30天视频数: {{ result.videos30 }}</p>
+<p>最近30天平均播放: {{ result.avg30 }}</p>
+
+<p>90天平均播放: {{ result.avg90 }}</p>
+<p>中位播放: {{ result.median }}</p>
+
+<p>CPM: {{ result.cpm }}</p>
+
+<p>建议报价: {{ result.suggest_low }} ~ {{ result.suggest_high }} USD</p>
+
+{% endif %}
+
+{% endif %}
+
+</body>
+</html>
