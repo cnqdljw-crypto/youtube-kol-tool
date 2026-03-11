@@ -1,15 +1,17 @@
-from flask import Flask, request, render_template
-import yt_dlp
+import os
 import time
 import statistics
 import logging
+from flask import Flask, request, render_template
+import yt_dlp
 
+# 禁用 yt-dlp 警告
 logging.getLogger("yt_dlp").setLevel(logging.ERROR)
 
 app = Flask(__name__)
 
+# 分析函数
 def analyze_channel(channel, price):
-
     now = time.time()
     day = 86400
     days30 = 30 * day
@@ -35,7 +37,6 @@ def analyze_channel(channel, price):
     video_ids = [v["id"] for v in videos if v]
 
     for vid in video_ids:
-
         url = "https://www.youtube.com/watch?v=" + vid
 
         try:
@@ -51,17 +52,16 @@ def analyze_channel(channel, price):
         if not view or not timestamp:
             continue
 
+        # 过滤 Shorts
         if duration and duration < 60:
             continue
 
         age = now - timestamp
-
         if age < day:
             continue
 
         if age <= days30:
             views30.append(view)
-
         if age <= days90:
             views90.append(view)
 
@@ -89,24 +89,17 @@ def analyze_channel(channel, price):
 
     return result
 
-
+# 首页路由
 @app.route("/", methods=["GET", "POST"])
 def index():
-
     result = None
-
     if request.method == "POST":
-
         channel = request.form["channel"]
         price = float(request.form["price"])
-
         result = analyze_channel(channel, price)
-
     return render_template("index.html", result=result)
 
-
+# Render 支持动态端口
 if __name__ == "__main__":
-
-   import os
-port = int(os.environ.get("PORT", 10000))
-app.run(host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
